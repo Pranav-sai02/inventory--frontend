@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Sidebar from './components/sidebar/Sidebar';
-import Navbar from './components/navbar/Navbar';
-import AddHotel from './components/addHotel/AddHotel';
+import Sidebar from './Components/sidebar/Sidebar';
+import Navbar from './Components/navbar/Navbar';
+import AddHotel from './Components/addHotel/AddHotel';
 
 import './App.css';
-import PropertiesPage from './pages/PropertiesPage';
+import PropertiesPage from './Components/PropertiesPage/PropertiesPage';
 
 const App: React.FC = () => {
   const [activeMenuItem, setActiveMenuItem] = useState('Home');

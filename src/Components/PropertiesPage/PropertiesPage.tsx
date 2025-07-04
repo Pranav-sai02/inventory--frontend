@@ -1,8 +1,8 @@
 // src/pages/PropertiesPage.tsx
 import React, { useState } from 'react';
-import PropertyTable from '../components/propertyTable/PropertyTable';
-import PropertyFilters from '../components/propertyTable/PropertyFilters';
-import { Property, PropertyStatus } from '../type/Property';
+import PropertyTable from '../propertyTable/PropertyTable';
+import PropertyFilters from '../propertyTable/PropertyFilters';
+import { Property, PropertyStatus } from '../../type/Property';
 
 
 import './PropertiesPage.css';
