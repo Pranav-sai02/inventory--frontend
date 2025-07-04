@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { Hotel } from "../../type/Hotel";
-
-
+import { useNavigate } from "react-router-dom";
 import "./AddHotel.css";
 
 const AddHotel: React.FC = () => {
   const [hotel, setHotel] = useState<Hotel>({
-    hotelId: '',
+    hotelId: 0,
     hotelName: "",
     hotelAddress: "",
   });
+
+  const navigate = useNavigate(); 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -18,53 +19,50 @@ const AddHotel: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // try {
-    //   await saveHotel(hotel);
-    //   alert("Hotel saved successfully");
-    //   setHotel({ hotelId: 0, hotelName: "", hotelAddress: "" });
-    // } catch (error: any) {
-    //   alert("Error saving hotel: " + (error.response?.data?.message || error.message));
-    // }
+    // Save logic (optional)
   };
 
   return (
-    <div className="add-hotel-wrapper">  
-    <div className="add-hotel-container">
-      <h2>Hotel Deatils</h2>
-      <form onSubmit={handleSubmit}>
-        
-        <input
-          type="number"
-          name="hotelId"
-          placeholder="Hotel ID"
-          value={hotel.hotelId}
-          onChange={handleChange}
-          required
-        />
+    <div className="add-hotel-wrapper">
+      <div className="add-hotel-container">
 
-        
-        <input
-          type="text"
-          name="hotelName"
-          placeholder="Hotel Name"
-          value={hotel.hotelName}
-          onChange={handleChange}
-          required
-        />
+        <div className="back-button" onClick={() => navigate('/')}>
+          ← Back
+        </div>
 
-        <input
-          type="text"
-          name="hotelAddress"
-          placeholder="Hotel Address"
-          value={hotel.hotelAddress}
-          onChange={handleChange}
-          required
-        />
+        <h2>Hotel Details</h2>
+        <form onSubmit={handleSubmit}>
+          <label>Hotel ID</label>
+          <input
+            type="number"
+            name="hotelId"
+            value={hotel.hotelId}
+            onChange={handleChange}
+            required
+          />
 
-        <button type="submit">Save</button>
-      </form>
+          <label>Hotel Name</label>
+          <input
+            type="text"
+            name="hotelName"
+            value={hotel.hotelName}
+            onChange={handleChange}
+            required
+          />
+
+          <label>Hotel Address</label>
+          <input
+            type="text"
+            name="hotelAddress"
+            value={hotel.hotelAddress}
+            onChange={handleChange}
+            required
+          />
+
+          <button type="submit">Save Hotel</button>
+        </form>
+      </div>
     </div>
-  </div>
   );
 };
 

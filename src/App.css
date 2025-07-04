@@ -12,11 +12,12 @@
 }
 
 .content-area {
-  flex: 1;
+   flex: 1;
+  display: block; 
   padding: 20px;
   background-color: #f4f4f4;
   overflow-y: auto;
-   min-width: 0;
+
 }
 .sidebar {
   width: 220px;

@@ -1,0 +1,70 @@
+
+.property-table-container {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow-x: auto;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+thead {
+  background-color: #f0f0f0;
+}
+
+th{
+     color: #1abc9c;
+     padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.property-name {
+  font-weight: bold;
+}
+
+.property-address {
+  font-size: 12px;
+  color: #666;
+}
+
+.property-status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+  text-transform: capitalize;
+}
+
+.status-live {
+  background-color: #e0f8e9;
+  color: #2e8b57;
+}
+
+.status-inactive {
+  background-color: #f8e0e0;
+  color: #a94442;
+}
+
+.status-pending {
+  background-color: #fff7e0;
+  color: #a67c00;
+}
+
+.action-button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #666;
+}
