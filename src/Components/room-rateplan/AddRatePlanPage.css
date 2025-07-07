@@ -1,0 +1,71 @@
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #f4f4f4; /* Gray background outside the white box */
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.page-wrapper {
+  min-height: 100vh;          /* Full screen height */
+  display: flex;
+  flex-direction: column;     /* stack children vertically */
+  align-items: center;        /* center horizontally */
+  padding: 40px 20px;         /* spacing from top */
+}
+
+.rateplan-box {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 30px 20px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.form-select {
+  padding: 12px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  width: 100%;
+}
+
+.button-group-right {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.save-btn {
+  background-color: #1abc9c;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.save-btn:hover {
+  background-color: #16a085;
+}

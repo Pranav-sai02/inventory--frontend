@@ -1,0 +1,121 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.inventory-page {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+}
+
+.inventory-header {
+  background-color: #1abc9c;
+  color: white;
+  font-weight: bold;
+  padding: 15px 20px;
+  font-size: 18px;
+}
+
+.inventory-content {
+  /* Removed flex: 1 so it shrinks to content height */
+  padding: 30px 20px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.inventory-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.inventory-row label {
+  font-weight: 500;
+  margin-bottom: 6px;
+  font-size: 15px;
+  color: #333;
+}
+
+.days-row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.days-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.day-btn {
+  width: 32px;
+  height: 32px;
+  background: white;
+  border: 1px solid #00796b;
+  color: #00796b;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.day-btn.selected {
+  background: #00796b;
+  color: white;
+}
+
+.rooms-inputs {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.room-input {
+  display: flex;
+  flex-direction: column;
+}
+
+.room-input label {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.room-input input {
+  width: 120px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.submit-container {
+  /* Removed margin-top: auto */
+  text-align: right;
+}
+
+.submit-btn {
+  background-color: #1abc9c;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.date-picker-input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 300px;
+}

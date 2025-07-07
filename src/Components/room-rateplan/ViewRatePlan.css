@@ -1,0 +1,49 @@
+.view-rateplan-container {
+  border: 1px solid #ddd;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+.view-rateplan-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.view-rateplan-table th,
+.view-rateplan-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.action-line {
+  line-height: 1.4;
+}
+
+.action-link {
+  color: #1976d2;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  text-align: left;
+}
+
+.action-link:hover {
+  text-decoration: underline;
+}

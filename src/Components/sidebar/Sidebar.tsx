@@ -13,16 +13,20 @@ const Sidebar: React.FC<SidebarProps> = ({
     { name: 'Add Hotel', path: '/add-hotel' },
     { name: 'Properties', path: '/properties' },
     { name: 'Room & Rateplan', path: '/room-rateplan' },
-    { name: 'Room Allocated Count', path: '/room-count' },
+    { name: 'Room Allocated Count', path: '/inventory-entry' }, // ✅ FIXED PATH
     { name: 'Inventory', path: '/inventory' },
   ];
 
   return (
     <div className="sidebar">
-    
+      {/* Optional logo */}
+      {/* <img src={AvootaLogo} alt="Logo" className="sidebar-logo" /> */}
       <ul className="menu-list">
         {menuItems.map((item) => (
-          <li key={item.name} className={activeMenuItem === item.name ? 'active-menu-item' : ''}>
+          <li
+            key={item.name}
+            className={activeMenuItem === item.name ? 'active-menu-item' : ''}
+          >
             <Link
               to={item.path}
               onClick={() => onMenuItemClick(item.name)}
