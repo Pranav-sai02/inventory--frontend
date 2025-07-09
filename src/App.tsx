@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Sidebar from './Components/sidebar/Sidebar';
 import Navbar from './Components/navbar/Navbar';
-import AddHotel from './Components/addHotel/AddHotel';
-import PropertiesPage from './Components/PropertiesPage/PropertiesPage';
+
 import RoomList from './Components/room-rateplan/RoomList';
 import CreateRoom from './Components/create-room/CreateRoom';
 import AddRatePlanPage from './Components/room-rateplan/AddRatePlanPage';
@@ -12,6 +11,8 @@ import AddRatePlanPage from './Components/room-rateplan/AddRatePlanPage';
 import RoomInventoryEntry from './Components/RoomInventory/RoomInventoryEntry';
 
 import './App.css';
+import AddHotel from './Components/addHotel/AddHotel';
+import PropertiesPage from './Components/PropertiesPage/PropertyPage';
 
 const App: React.FC = () => {
   const [activeMenuItem, setActiveMenuItem] = useState('Home');

@@ -1,0 +1,63 @@
+{
+  "properties": [
+    {
+      "id": "prop-001",
+      "name": "Sunshine Residency",
+      "address": "12 MG Road, Bengaluru",
+      "status": "LIVE"
+    },
+    {
+      "id": "prop-002",
+      "name": "Hilltop Heights",
+      "address": "88 Valley View, Ooty",
+      "status": "PENDING"
+    },
+    {
+      "id": "prop-003",
+      "name": "Ocean Pearl Apartments",
+      "address": "5 Seaside Lane, Goa",
+      "status": "DRAFT"
+    },
+    {
+      "id": "prop-004",
+      "name": "Skyline Towers",
+      "address": "21 High Street, Mumbai",
+      "status": "INACTIVE"
+    },
+    {
+      "id": "prop-005",
+      "name": "Green Meadows",
+      "address": "34 Nature Road, Pune",
+      "status": "REJECTED"
+    },{
+    "id": "prop-006",
+    "name": "Lakeview Villas",
+    "address": "77 Lakeside Drive, Udaipur",
+    "status": "LIVE"
+  },
+  {
+    "id": "prop-007",
+    "name": "Palm Grove Estate",
+    "address": "103 Coconut Avenue, Kochi",
+    "status": "PENDING"
+  },
+  {
+    "id": "prop-008",
+    "name": "Crystal Bay Residences",
+    "address": "89 Marine Parade, Chennai",
+    "status": "DRAFT"
+  },
+  {
+    "id": "prop-009",
+    "name": "Mountain Crest",
+    "address": "56 Hill Rise, Shimla",
+    "status": "INACTIVE"
+  },
+  {
+    "id": "prop-010",
+    "name": "Golden Horizon",
+    "address": "12 Sunrise Path, Jaipur",
+    "status": "REJECTED"
+  }
+  ]
+}

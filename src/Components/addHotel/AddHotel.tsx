@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { Hotel } from "../../type/Hotel";
+
 import { useNavigate } from "react-router-dom";
 import "./addHotel.css";
+import { useSaveHotel } from "../../hooks/useHotels";
+import { Hotel } from "../../type/Hotel";
 
 const AddHotel: React.FC = () => {
   const [hotel, setHotel] = useState<Hotel>({
@@ -10,33 +12,54 @@ const AddHotel: React.FC = () => {
     hotelAddress: "",
   });
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+  const { mutate: saveHotel, isPending } = useSaveHotel(); // 👈 React Query mutation
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setHotel({ ...hotel, [name]: name === "hotelId" ? parseInt(value) : value });
+    setHotel((prev) => ({
+      ...prev,
+      [name]: name === "hotelId" ? parseInt(value) : value,
+    }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Save logic (optional)
+
+    if (!hotel.hotelId || !hotel.hotelName.trim() || !hotel.hotelAddress.trim()) {
+      alert("All fields are required!");
+      return;
+    }
+
+    console.log("Saving hotel:", hotel); // Debug log
+
+    saveHotel(hotel, {
+      onSuccess: () => {
+        alert("✅ Hotel saved successfully!");
+        setHotel({ hotelId: 0, hotelName: "", hotelAddress: "" });
+      },
+      onError: (error) => {
+        console.error("❌ Error saving hotel:", error);
+        alert("❌ Failed to save hotel.");
+      },
+    });
   };
 
   return (
     <div className="add-hotel-wrapper">
       <div className="add-hotel-container">
-
-        <div className="back-button" onClick={() => navigate('/')}>
+        <div className="back-button" onClick={() => navigate("/")}>
           ← Back
         </div>
 
         <h2>Hotel Details</h2>
+
         <form onSubmit={handleSubmit}>
           <label>Hotel ID</label>
           <input
             type="number"
             name="hotelId"
-            value={hotel.hotelId}
+            value={hotel.hotelId || ""}
             onChange={handleChange}
             required
           />
@@ -59,7 +82,9 @@ const AddHotel: React.FC = () => {
             required
           />
 
-          <button type="submit">Save Hotel</button>
+          <button type="submit" disabled={isPending}>
+            {isPending ? "Saving..." : "Save Hotel"}
+          </button>
         </form>
       </div>
     </div>
