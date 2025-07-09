@@ -1,36 +1,25 @@
 // src/pages/PropertiesPage.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropertyTable from '../propertyTable/PropertyTable';
 import PropertyFilters from '../propertyTable/PropertyFilters';
 import { PropertyStatus, Property } from '../../type/Property';
 import './PropertiesPage.css';
-import { fetchAllHotels } from '../../service/hotel.service'; // ✅ using your custom service
+import { useHotels } from '../../hooks/useHotels'; // ✅ React Query hook
 
 const PropertiesPage: React.FC = () => {
-  const [hotels, setHotels] = useState<Property[]>([]);
+  const { data: hotelsData, isLoading, isError } = useHotels(); // ✅ get all hotels from API
+
   const [searchQuery, setSearchQuery] = useState('');
   const [currentFilter, setCurrentFilter] = useState('All');
 
-  useEffect(() => {
-    const loadHotels = async () => {
-      try {
-        const data = await fetchAllHotels(); // ✅ call service function
-        const mappedData: Property[] = data.map((hotel) => ({
-          id: hotel.hotelId.toString(),
-          name: hotel.hotelName,
-          address: hotel.hotelAddress,
-          status: PropertyStatus.LIVE, // ✅ setting default
-        }));
-        setHotels(mappedData);
-      } catch (error) {
-        console.error('❌ Failed to fetch hotels:', error);
-      }
-    };
+  const mappedHotels: Property[] = hotelsData?.map((hotel) => ({
+    id: hotel.hotelId.toString(),
+    name: hotel.hotelName,
+    address: hotel.hotelAddress,
+    status: PropertyStatus.LIVE, // ✅ default status
+  })) || [];
 
-    loadHotels();
-  }, []);
-
-  const filteredProperties = hotels.filter((property) => {
+  const filteredProperties = mappedHotels.filter((property) => {
     const matchesFilter = currentFilter === 'All' || property.status === currentFilter;
     const matchesSearch =
       property.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -49,6 +38,9 @@ const PropertiesPage: React.FC = () => {
   const handleActionClick = (propertyId: string) => {
     alert(`Action clicked for property ID: ${propertyId}`);
   };
+
+  if (isLoading) return <p>Loading hotels...</p>;
+  if (isError) return <p>Error loading hotels.</p>;
 
   return (
     <div className="properties-page">

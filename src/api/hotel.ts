@@ -5,7 +5,7 @@ import axiosInstance from './axiosInstance';
 
 // ✅ Fetch all hotels
 export const fetchAllHotels = async (): Promise<Hotel[]> => {
-  const response = await axiosInstance.get('/hotels');
+  const response = await axiosInstance.get('/hotels/hotels');
   return response.data;
 };
 
