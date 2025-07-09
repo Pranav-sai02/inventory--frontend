@@ -2,6 +2,10 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AddRatePlanPage.css";
 
+import { RatePlan } from "../../type/addRatePlan";
+import { useCreateRatePlan } from "../../hooks/useRatePlan";
+
+// Hardcoded options
 const rateplanOptions = ["AP", "EP", "CP", "MAP"];
 const mealPlanOptions = [
   "Accommodation only",
@@ -19,12 +23,30 @@ const mealPlanOptions = [
 const AddRatePlanPage: React.FC = () => {
   const navigate = useNavigate();
 
+  // Static room ID for testing
+  const roomId = 1;
+
   const [rateplanName, setRateplanName] = useState("EP");
   const [mealPlan, setMealPlan] = useState("Accommodation only");
 
+  const createRatePlanMutation = useCreateRatePlan();
+
   const handleSave = () => {
-    alert(`Saved Rateplan:\nName: ${rateplanName}\nMeal Plan: ${mealPlan}`);
-    navigate(-1);
+    const newRatePlan: Omit<RatePlan, "id"> = {
+      ratePlanName: rateplanName,
+      mealPlan,
+      roomId, // 👈 sent as part of payload
+    };
+
+    createRatePlanMutation.mutate(newRatePlan, {
+      onSuccess: () => {
+        alert("Rate plan created successfully!");
+        navigate(-1); // return to previous page
+      },
+      onError: () => {
+        alert("Failed to create rate plan.");
+      },
+    });
   };
 
   return (

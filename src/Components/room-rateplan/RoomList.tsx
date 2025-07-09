@@ -1,55 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./RoomList.css";
-import ViewRatePlan, { RatePlan } from "../room-rateplan/ViewRatePlan";
+import ViewRatePlan from "../room-rateplan/ViewRatePlan";
+import { useQuery } from "@tanstack/react-query";
+import { fetchRoomsByHotel } from "../../api/rooms";
 
 interface Room {
+  id: number;
   name: string;
   description: string;
   active: boolean;
-  rateplans: string[];
 }
-
-const initialRooms: Room[] = [
-  { name: "Twin Bed Room", description: "clean and neat", active: true, rateplans: ["EP", "MP", "CP"] },
-  { name: "Beach Room", description: "Beach Room", active: true, rateplans: ["MP", "CP"] },
-  { name: "Executive Room", description: "comfortable stay and free room service", active: true, rateplans: ["EP", "CP"] },
-];
 
 const RoomList: React.FC = () => {
   const navigate = useNavigate();
-  const [rooms, setRooms] = useState<Room[]>(initialRooms);
+  const hotelId = 111;
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["rooms", hotelId],
+    queryFn: () => fetchRoomsByHotel(hotelId),
+  });
+
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [selectedRoomIndex, setSelectedRoomIndex] = useState<number | null>(null);
-  const [selectedRateplans, setSelectedRateplans] = useState<RatePlan[] | null>(null);
+
+  useEffect(() => {
+    if (data) {
+      const transformedRooms: Room[] = data.map((room: any) => ({
+        id: room.roomId,
+        name: room.roomName,
+        description: room.description,
+        active: true, // Default since API doesn’t return this
+      }));
+      setRooms(transformedRooms);
+    }
+  }, [data]);
 
   const toggleActive = (index: number) => {
-    const updatedRooms = [...rooms];
-    updatedRooms[index].active = !updatedRooms[index].active;
-    setRooms(updatedRooms);
+    const updated = [...rooms];
+    updated[index].active = !updated[index].active;
+    setRooms(updated);
   };
 
-  const handleViewRateplans = (room: Room, index: number) => {
+  const handleViewRateplans = (index: number) => {
     if (selectedRoomIndex === index) {
       setSelectedRoomIndex(null);
-      setSelectedRateplans(null);
     } else {
-      const mockRateplans: RatePlan[] = room.rateplans.map((rp) => ({
-        name: rp,
-        mealPlan: rp === "EP" ? "FREE Breakfast" : "FREE All Meals",
-        paymentMode: "Pay Now",
-        active: true,
-      }));
-      setSelectedRateplans(mockRateplans);
       setSelectedRoomIndex(index);
     }
   };
 
-  const handleRateplanCheckboxChange = (index: number) => {
-    if (!selectedRateplans) return;
-    const updated = [...selectedRateplans];
-    updated[index].active = !updated[index].active;
-    setSelectedRateplans(updated);
-  };
+  if (isLoading) return <div>Loading rooms...</div>;
+  if (isError) return <div>Error loading rooms.</div>;
 
   return (
     <div>
@@ -94,7 +96,7 @@ const RoomList: React.FC = () => {
         </thead>
         <tbody>
           {rooms.map((room, index) => (
-            <React.Fragment key={index}>
+            <React.Fragment key={room.id}>
               <tr className="room-row">
                 <td>{room.name}</td>
                 <td>{room.description}</td>
@@ -111,30 +113,32 @@ const RoomList: React.FC = () => {
                     <button className="action-link" onClick={() => navigate("/edit-room")}>
                       EDIT ROOM
                     </button>
-                    <button className="action-link" onClick={() => navigate("/add-rateplan")}>
+                    <button
+                      className="action-link"
+                      onClick={() =>
+                        navigate("/add-rateplan", { state: { roomId: room.id } })
+                      }
+                    >
                       + ADD RATEPLAN
                     </button>
                   </div>
                 </td>
                 <td className="rateplans">
-                  <ol>
-                    {room.rateplans.map((rp, idx) => (
-                      <li key={idx}>{rp}</li>
-                    ))}
-                  </ol>
-                  <button className="action-link" onClick={() => handleViewRateplans(room, index)}>
-                    {selectedRoomIndex === index ? "CLOSE RATEPLANS" : "CLICK TO VIEW RATEPLANS"}
+                  <button
+                    className="action-link"
+                    onClick={() => handleViewRateplans(index)}
+                  >
+                    {selectedRoomIndex === index
+                      ? "CLOSE RATEPLANS"
+                      : "CLICK TO VIEW RATEPLANS"}
                   </button>
                 </td>
               </tr>
 
-              {selectedRoomIndex === index && selectedRateplans && (
+              {selectedRoomIndex === index && (
                 <tr>
                   <td colSpan={4}>
-                    <ViewRatePlan
-                      rateplans={selectedRateplans}
-                      onCheckboxChange={handleRateplanCheckboxChange}
-                    />
+                    <ViewRatePlan roomId={room.id} />
                   </td>
                 </tr>
               )}

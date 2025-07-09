@@ -1,19 +1,20 @@
 import React from "react";
 import "./ViewRatePlan.css";
+import { useRatePlansByRoom } from "../../hooks/useRatePlan";
 
-export interface RatePlan {
-  name: string;
-  mealPlan: string;
-  paymentMode: string;
-  active: boolean;
-}
 
 interface ViewRatePlanProps {
-  rateplans: RatePlan[];
-  onCheckboxChange: (index: number) => void;
+  roomId: number;
+  onCheckboxChange?: (index: number) => void;
 }
 
-const ViewRatePlan: React.FC<ViewRatePlanProps> = ({ rateplans, onCheckboxChange }) => {
+const ViewRatePlan: React.FC<ViewRatePlanProps> = ({ roomId, onCheckboxChange }) => {
+  const { data: rateplans, isLoading, isError } = useRatePlansByRoom(roomId);
+
+  if (isLoading) return <p>Loading rate plans...</p>;
+  if (isError) return <p>Failed to load rate plans.</p>;
+  if (!rateplans || rateplans.length === 0) return <p>No rate plans found for this room.</p>;
+
   return (
     <div className="view-rateplan-container">
       <h3>Rate Plans Details:</h3>
@@ -22,22 +23,20 @@ const ViewRatePlan: React.FC<ViewRatePlanProps> = ({ rateplans, onCheckboxChange
           <tr>
             <th>Rateplan Name</th>
             <th>Meal Plan</th>
-            <th>Payment Mode</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {rateplans.map((rp, idx) => (
-            <tr key={idx}>
-              <td>{rp.name}</td>
+            <tr key={rp.id}>
+              <td>{rp.ratePlanName}</td>
               <td>{rp.mealPlan}</td>
-              <td>{rp.paymentMode}</td>
               <td className="actions">
                 <label>
                   <input
                     type="checkbox"
-                    checked={rp.active}
-                    onChange={() => onCheckboxChange(idx)}
+                    checked={true} // 🔧 Replace this if your backend has an `active` field
+                    onChange={() => onCheckboxChange?.(idx)}
                     style={{ marginRight: "5px" }}
                   />
                   Active
@@ -49,7 +48,10 @@ const ViewRatePlan: React.FC<ViewRatePlanProps> = ({ rateplans, onCheckboxChange
                     </button>
                   </div>
                   <div className="action-line">
-                    <button className="action-link" onClick={() => alert("Offering inclusion...")}>
+                    <button
+                      className="action-link"
+                      onClick={() => alert("Offering inclusion...")}
+                    >
                       + OFFER AN INCLUSION
                     </button>
                   </div>
