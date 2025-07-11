@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./AddRatePlanPage.css";
 
-import { RatePlan } from "../../../type/addRatePlan";
+import { RatePlan } from "../../../type/RatePlan";
 import { useCreateRatePlan } from "../../../hooks/useRatePlan";
 
 const rateplanOptions = ["AP", "EP", "CP", "MAP"];
@@ -24,7 +24,7 @@ const AddRatePlanPage: React.FC = () => {
   const { roomId } = useParams(); // 👈 get from URL
   const numericRoomId = parseInt(roomId || "", 10);
 
-  const [rateplanName, setRateplanName] = useState("EP");
+  const [ratePlanName, setRateplanName] = useState("EP");
   const [mealPlan, setMealPlan] = useState("Accommodation only");
 
   const createRatePlanMutation = useCreateRatePlan();
@@ -36,18 +36,18 @@ const AddRatePlanPage: React.FC = () => {
     }
 
     const newRatePlan: Omit<RatePlan, "id"> = {
-      ratePlanName: rateplanName,
+      ratePlanName, // ✅ Correct key name
       mealPlan,
       roomId: numericRoomId,
     };
 
     createRatePlanMutation.mutate(newRatePlan, {
       onSuccess: () => {
-        alert("Rate plan created successfully!");
+        alert("✅ Rate plan created successfully!");
         navigate(-1);
       },
       onError: () => {
-        alert("Failed to create rate plan.");
+        alert("❌ Failed to create rate plan.");
       },
     });
   };
@@ -59,7 +59,7 @@ const AddRatePlanPage: React.FC = () => {
           <label htmlFor="rateplan">Rateplan Name *</label>
           <select
             id="rateplan"
-            value={rateplanName}
+            value={ratePlanName}
             onChange={(e) => setRateplanName(e.target.value)}
             className="form-select"
           >
@@ -88,8 +88,15 @@ const AddRatePlanPage: React.FC = () => {
         </div>
 
         <div className="button-group-right">
-          <button onClick={handleSave} className="save-btn">
-            SAVE AND CONTINUE
+          <button
+            onClick={handleSave}
+            className="save-btn"
+            disabled={createRatePlanMutation.isPending}
+          >
+            {createRatePlanMutation.isPending ? "Saving..." : "SAVE AND CONTINUE"}
+          </button>
+          <button onClick={() => navigate(-1)} className="cancel-btn">
+            Cancel
           </button>
         </div>
       </div>

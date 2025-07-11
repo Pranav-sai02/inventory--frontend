@@ -2,7 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Hotel } from '../type/Hotel';
 
-import { updateHotel, deleteHotel, fetchAllHotels, saveHotel } from '../api/hotel';
+import { updateHotel, fetchAllHotels, saveHotel } from '../api/hotel';
 
 
 // React Query for fetching
@@ -10,7 +10,9 @@ export const useHotels = () => {
   return useQuery<Hotel[]>({
     queryKey: ['hotels'],
     queryFn: fetchAllHotels,
+
   });
+
 };
 
 // React Query for saving
@@ -21,6 +23,9 @@ export const useSaveHotel = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['hotels'] }); // refetch
     },
+    onError: (error) => {
+      console.error('Save failed:', error);
+    }
   });
 };
 
@@ -36,12 +41,12 @@ export const useUpdateHotel = () => {
 };
 
 // React Query for deleting
-export const useDeleteHotel = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: deleteHotel,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['hotels'] });
-    },
-  });
-};
+// export const useDeleteHotel = () => {
+//   const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: deleteHotel,
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ['hotels'] });
+//     },
+//   });
+// };

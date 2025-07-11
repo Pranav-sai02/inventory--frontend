@@ -6,25 +6,22 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchRoomsByHotel } from "../../../api/rooms";
 import { useHotels } from "../../../hooks/useHotels";
 import { Hotel } from "../../../type/Hotel";
-
-interface Room {
-  id: number;
-  name: string;
-  description: string;
-  active: boolean;
-}
+import { Room } from "../../../type/room";
 
 const RoomList: React.FC = () => {
   const navigate = useNavigate();
-  const [hotelId, setHotelId] = useState<number>(111);
-
-  // Fetch hotels for dropdown and hotel info
+  const [hotelId, setHotelId] = useState<number>(0);
   const { data: hotels } = useHotels();
 
-  // Find the selected hotel info
+  // Set hotelId to first available once hotels load
+  useEffect(() => {
+    if (hotels && hotels.length > 0 && hotelId === 0) {
+      setHotelId(hotels[0].hotelId);
+    }
+  }, [hotels]);
+
   const selectedHotel: Hotel | undefined = hotels?.find((h) => h.hotelId === hotelId);
 
-  // Fetch rooms for the selected hotel
   const {
     data: roomsData,
     isLoading,
@@ -41,9 +38,15 @@ const RoomList: React.FC = () => {
   useEffect(() => {
     if (roomsData) {
       const transformed: Room[] = roomsData.map((room: any) => ({
-        id: room.roomId,
-        name: room.roomName,
+        roomId: room.roomId,
+        roomName: room.roomName,
         description: room.description,
+        roomType: room.roomType,
+        roomView: room.roomView,
+        roomSize: room.roomSize,
+        sizeUnit: room.sizeUnit,
+        numberOfRooms: room.numberOfRooms,
+        hotelId: room.hotelId,
         active: true,
       }));
       setRooms(transformed);
@@ -57,7 +60,7 @@ const RoomList: React.FC = () => {
   };
 
   const handleViewRateplans = (index: number) => {
-    setSelectedRoomIndex(prev => (prev === index ? null : index));
+    setSelectedRoomIndex((prev) => (prev === index ? null : index));
   };
 
   if (isLoading) return <div>Loading rooms...</div>;
@@ -65,7 +68,7 @@ const RoomList: React.FC = () => {
 
   return (
     <div>
-      {/* Header bar */}
+      {/* Header */}
       <div className="header-bar">
         <div className="left-header">
           <button className="back-btn" onClick={() => navigate(-1)}>
@@ -90,7 +93,10 @@ const RoomList: React.FC = () => {
       {/* Top bar */}
       <div className="top-bar">
         <h2 className="top-bar-title">Existing Rooms ({rooms.length})</h2>
-        <button className="create-room-btn" onClick={() => navigate("/create-room")}>
+        <button
+          className="create-room-btn"
+          onClick={() => navigate("/create-room", { state: { hotelId } })}
+        >
           + CREATE NEW ROOM
         </button>
       </div>
@@ -107,9 +113,9 @@ const RoomList: React.FC = () => {
         </thead>
         <tbody>
           {rooms.map((room, index) => (
-            <React.Fragment key={room.id}>
+            <React.Fragment key={room.roomId}>
               <tr className="room-row">
-                <td>{room.name}</td>
+                <td>{room.roomName}</td>
                 <td>{room.description}</td>
                 <td>
                   <div className="actions">
@@ -123,13 +129,13 @@ const RoomList: React.FC = () => {
                     </label>
                     <button
                       className="action-link"
-                      onClick={() => navigate("/create-room", { state: { room: room } })}
+                      onClick={() => navigate("/create-room", { state: { room } })}
                     >
                       EDIT ROOM
                     </button>
                     <button
                       className="action-link"
-                      onClick={() => navigate(`/add-rateplan/${room.id}`)}
+                      onClick={() => navigate(`/add-rateplan/${room.roomId}`)}
                     >
                       + ADD RATEPLAN
                     </button>
@@ -145,7 +151,7 @@ const RoomList: React.FC = () => {
               {selectedRoomIndex === index && (
                 <tr>
                   <td colSpan={4}>
-                    <ViewRatePlan roomId={room.id} />
+                    <ViewRatePlan roomId={room.roomId} />
                   </td>
                 </tr>
               )}

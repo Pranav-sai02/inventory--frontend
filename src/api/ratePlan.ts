@@ -1,4 +1,4 @@
-import { RatePlan } from '../type/addRatePlan';
+import { RatePlan } from '../type/RatePlan';
 import axiosInstance from './axiosInstance';
 
 // ✅ GET rate plans by roomId
@@ -14,7 +14,7 @@ export const createRatePlan = async (ratePlan: Omit<RatePlan, 'id'>): Promise<vo
 
 // ✅ UPDATE an existing rate plan by ID
 export const updateRatePlan = async (ratePlan: RatePlan): Promise<void> => {
-  await axiosInstance.put(`/rateplans/update/${ratePlan.id}`, ratePlan);
+  await axiosInstance.put(`/rateplans/update/${ratePlan.ratePlanId}`, ratePlan);
 };
 
 // // ✅ DELETE a rate plan by ID (optional, if you add it to backend)

@@ -2,7 +2,6 @@ import React from "react";
 import "./ViewRatePlan.css";
 import { useRatePlansByRoom } from "../../../hooks/useRatePlan";
 
-
 interface ViewRatePlanProps {
   roomId: number;
   onCheckboxChange?: (index: number) => void;
@@ -28,14 +27,14 @@ const ViewRatePlan: React.FC<ViewRatePlanProps> = ({ roomId, onCheckboxChange })
         </thead>
         <tbody>
           {rateplans.map((rp, idx) => (
-            <tr key={rp.id}>
-              <td>{rp.ratePlanName}</td>
+            <tr key={rp.ratePlanId ?? idx}>
+              <td>{rp.ratePlanName}</td> {/* ✅ based on your model */}
               <td>{rp.mealPlan}</td>
               <td className="actions">
                 <label>
                   <input
                     type="checkbox"
-                    checked={true} // 🔧 Replace this if your backend has an `active` field
+                    checked={true} // ✅ hardcoded for now
                     onChange={() => onCheckboxChange?.(idx)}
                     style={{ marginRight: "5px" }}
                   />
@@ -43,7 +42,10 @@ const ViewRatePlan: React.FC<ViewRatePlanProps> = ({ roomId, onCheckboxChange })
                 </label>
                 <div className="action-buttons">
                   <div className="action-line">
-                    <button className="action-link" onClick={() => alert("Editing rateplan...")}>
+                    <button
+                      className="action-link"
+                      onClick={() => alert("Editing rateplan...")}
+                    >
                       EDIT
                     </button>
                   </div>

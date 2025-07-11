@@ -1,30 +1,30 @@
 import { Room } from '../type/room';
 import axiosInstance from './axiosInstance';
 
-// Get rooms by hotel ID
+// ✅ Get rooms by hotel ID
 export const fetchRoomsByHotel = async (hotelId: number): Promise<Room[]> => {
-  const response = await axiosInstance.get(`/rooms/hetByHotel/${hotelId}`);
+  const response = await axiosInstance.get(`/rooms/getByHotel/${hotelId}`);
   return response.data;
 };
 
-// Get a single room by ID
-export const fetchRoomById = async (id: number): Promise<Room> => {
-  const response = await axiosInstance.get(`/rooms/getByRoom/${id}`);
+// ✅ Get a single room by room ID
+export const fetchRoomById = async (roomId: number): Promise<Room> => {
+  const response = await axiosInstance.get(`/rooms/getByRoom/${roomId}`);
   return response.data;
 };
 
-// Create a new room
-export const createRoom = async (room: Omit<Room, 'id'>): Promise<void> => {
+// ✅ Create a new room (omit roomId for creation)
+export const createRoom = async (room: Omit<Room, 'roomId'>): Promise<void> => {
   await axiosInstance.post('/rooms/saveRoom', room);
 };
 
-// Update a room by ID
+// ✅ Update room by roomId
 export const updateRoom = async (room: Room): Promise<Room> => {
-  const response = await axiosInstance.put(`/rooms/update/${room.id}`, room);
+  const response = await axiosInstance.put(`/rooms/update/${room.roomId}`, room);
   return response.data;
 };
 
-// Delete a room by ID
-export const deleteRoom = async (id: number): Promise<void> => {
-  await axiosInstance.delete(`/rooms/${id}`);
+// ✅ Delete room by ID
+export const deleteRoom = async (roomId: number): Promise<void> => {
+  await axiosInstance.delete(`/rooms/${roomId}`);
 };

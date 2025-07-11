@@ -1,7 +1,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createRatePlan, fetchRatePlansByRoom, updateRatePlan } from '../api/ratePlan';
-import { RatePlan } from '../type/addRatePlan';
+import { RatePlan } from '../type/RatePlan';
 
 // ✅ Fetch all rate plans for a given roomId
 export const useRatePlansByRoom = (roomId: number) => {

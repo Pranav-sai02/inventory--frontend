@@ -17,11 +17,11 @@ export const saveHotel = async (hotel: Hotel): Promise<Hotel> => {
 
 // ✅ Update hotel
 export const updateHotel = async (hotel: Hotel): Promise<Hotel> => {
-  const response = await axiosInstance.put('/hotels/update', hotel);
+  const response = await axiosInstance.put(`/hotels/update/${hotel.hotelId}`, hotel);
   return response.data;
 };
 
 // ✅ Delete hotel
-export const deleteHotel = async (hotelId: number): Promise<void> => {
-  await axiosInstance.delete(`/hotels/delete/${hotelId}`);
-};
+// export const deleteHotel = async (hotelId: number): Promise<void> => {
+//   await axiosInstance.delete(`/hotels/delete/${hotelId}`);
+// };

@@ -1,7 +1,7 @@
-import { RatePlan } from "./addRatePlan";
+import { RatePlan } from "./RatePlan";
 
 export interface Room {
-  id?: number;               // maps to roomId
+  roomId: number;              // maps to roomId
   roomName: string;          // maps to roomName
   description: string;       // maps to description
   roomType: string;          // maps to roomType

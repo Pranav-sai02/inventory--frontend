@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import "./CreateRoom.css";
 import { useCreateRoom, useUpdateRoom } from "../../hooks/useRooms";
@@ -8,7 +8,8 @@ const CreateRoom: React.FC = () => {
   const location = useLocation();
   const editingRoom = location.state?.room as Room | undefined;
 
-  const hotelId = 111; // static for now
+  const hotelId = editingRoom?.hotelId ?? location.state?.hotelId ?? 0;
+
   const createRoomMutation = useCreateRoom(hotelId);
   const updateRoomMutation = useUpdateRoom(hotelId);
 
@@ -26,8 +27,14 @@ const CreateRoom: React.FC = () => {
       return;
     }
 
+    if (!hotelId || hotelId === 0) {
+      alert("Invalid hotel selected. Please go back and choose a valid hotel.");
+      return;
+    }
+
     const payload: Room = {
       ...(editingRoom ?? {}),
+      roomId: editingRoom?.roomId ?? 0,
       roomName,
       description,
       numberOfRooms,
@@ -46,11 +53,10 @@ const CreateRoom: React.FC = () => {
       });
     } else {
       // 🆕 Create mode
-      const { id, ...createPayload } = payload;
+      const { roomId, ...createPayload } = payload;
       createRoomMutation.mutate(createPayload, {
         onSuccess: () => {
           alert("Room created successfully!");
-          // Reset only on create
           setRoomType("");
           setRoomView("");
           setRoomSize("");

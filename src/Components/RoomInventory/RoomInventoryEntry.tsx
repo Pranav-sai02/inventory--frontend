@@ -10,38 +10,33 @@ import { SaveInventoryRequest } from "../../type/roomAvailability";
 
 const RoomInventoryEntry: React.FC = () => {
   const navigate = useNavigate();
-  const hotelId = 111; // ✅ Static for now
-  const { data: hotels } = useHotels();
+  const { data: hotels } = useHotels(); // ✅ already includes rooms + ratePlans
   const saveInventoryMutation = useSaveInventory();
 
-  const [inventory, setInventory] = useState({
-    twinBed: "0",
-    beach: "0",
-    executive: "0",
-  });
-
+  const [selectedHotelId, setSelectedHotelId] = useState<number | null>(null);
+  const [inventory, setInventory] = useState<{ [roomId: string]: string }>({});
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   const [startDate, endDate] = dateRange;
 
-  const selectedHotel = hotels?.find((h) => h.hotelId === hotelId);
+  const selectedHotel = hotels?.find((h) => h.hotelId === selectedHotelId);
+  const rooms = selectedHotel?.rooms || [];
 
   const handleSubmit = () => {
-    if (!startDate || !endDate) {
-      alert("Please select a valid date range.");
+    if (!startDate || !endDate || !selectedHotelId) {
+      alert("Please select a valid hotel and date range.");
       return;
     }
 
     const payload: SaveInventoryRequest = {
-      hotelId,
-      fromDate: startDate.toISOString().split("T")[0], // ✅ renamed
-      toDate: endDate.toISOString().split("T")[0],     // ✅ renamed
-      rooms: [                                         // ✅ renamed
-        { roomId: 1, roomName: "Twin Bed Room", availableCount: parseInt(inventory.twinBed) },
-        { roomId: 2, roomName: "Beach Room", availableCount: parseInt(inventory.beach) },
-        { roomId: 3, roomName: "Executive Room", availableCount: parseInt(inventory.executive) },
-      ],
+      hotelId: selectedHotelId,
+      fromDate: startDate.toISOString().split("T")[0],
+      toDate: endDate.toISOString().split("T")[0],
+      rooms: rooms.map((room) => ({
+        roomId: room.roomId,
+        roomName: room.roomName,
+        availableCount: parseInt(inventory[room.roomId.toString()] || "0"),
+      })),
     };
-
 
     saveInventoryMutation.mutate(payload);
   };
@@ -86,7 +81,7 @@ const RoomInventoryEntry: React.FC = () => {
 
   return (
     <div>
-      {/* Header Bar */}
+      {/* Header */}
       <div className="header-bar">
         <div className="left-header">
           <button className="back-btn" onClick={() => navigate(-1)}>
@@ -94,15 +89,25 @@ const RoomInventoryEntry: React.FC = () => {
           </button>
           <div className="hotel-info">
             <div className="hotel-name">
-              Hotel Name: {selectedHotel?.hotelName || "Loading..."}
+              Hotel Name: {selectedHotel?.hotelName || "Select a hotel"}
             </div>
             <div className="hotel-address">
-              Address: {selectedHotel?.hotelAddress || "Fetching address..."}
+              Address: {selectedHotel?.hotelAddress || "Hotel address will appear here"}
             </div>
           </div>
         </div>
+
         <div className="hotel-dropdown">
-          <select value={hotelId} disabled>
+          <select
+            value={selectedHotelId ?? ""}
+            onChange={(e) => {
+              setSelectedHotelId(parseInt(e.target.value));
+              setInventory({}); // reset inventory on hotel change
+            }}
+          >
+            <option value="" disabled>
+              -- Select Hotel --
+            </option>
             {hotels?.map((hotel) => (
               <option key={hotel.hotelId} value={hotel.hotelId}>
                 {hotel.hotelName} - {hotel.hotelId}
@@ -112,7 +117,7 @@ const RoomInventoryEntry: React.FC = () => {
         </div>
       </div>
 
-      {/* Inventory Form Section */}
+      {/* Main Form */}
       <div className="inventory-page">
         <div className="inventory-header">Room Inventory Entry</div>
         <div className="inventory-content">
@@ -129,22 +134,21 @@ const RoomInventoryEntry: React.FC = () => {
             />
           </div>
 
-          {/* Room Inputs */}
+          {/* Room Inputs (from hotel.rooms) */}
           <div className="rooms-inputs">
-            {[
-              { key: "twinBed", label: "Twin Bed Room" },
-              { key: "beach", label: "Beach Room" },
-              { key: "executive", label: "Executive Room" },
-            ].map(({ key, label }) => (
-              <div className="room-input" key={key}>
-                <label>{label}</label>
+            {rooms.map((room) => (
+              <div className="room-input" key={room.roomId}>
+                <label>{room.roomName}</label>
                 <input
                   type="number"
                   min="0"
-                  value={inventory[key as keyof typeof inventory]}
+                  value={inventory[room.roomId.toString()] || "0"}
                   onChange={(e) => {
                     const value = Math.max(0, parseInt(e.target.value) || 0);
-                    setInventory({ ...inventory, [key]: value.toString() });
+                    setInventory((prev) => ({
+                      ...prev,
+                      [room.roomId.toString()]: value.toString(),
+                    }));
                   }}
                 />
               </div>
@@ -153,7 +157,7 @@ const RoomInventoryEntry: React.FC = () => {
 
           {/* Submit */}
           <div className="submit-container">
-            <button className="submit-btn" onClick={handleSubmit}>
+            <button className="submit-btn" onClick={handleSubmit} disabled={!selectedHotelId}>
               Submit Inventory
             </button>
           </div>
