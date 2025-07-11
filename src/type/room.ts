@@ -1,3 +1,5 @@
+import { RatePlan } from "./addRatePlan";
+
 export interface Room {
   id?: number;               // maps to roomId
   roomName: string;          // maps to roomName
@@ -9,5 +11,7 @@ export interface Room {
   numberOfRooms: number;     // maps to numberOfRooms
   hotelId: number;    
   
-    active?: boolean;       // maps to hotelId
+    active?: boolean;
+     isExpanded?: boolean; 
+     ratePlans?: RatePlan[] ;      // maps to hotelId
 }

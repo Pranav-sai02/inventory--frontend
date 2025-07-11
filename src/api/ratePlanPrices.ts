@@ -1,9 +1,8 @@
 // src/api/ratePlanPrices.ts
 
-import { RatePlanPriceDTO } from '../type/RatePlanPrice';
+import { RatePlanPriceDTO } from '../type/RatePlanPriceDto';
 import axiosInstance from './axiosInstance';
-// Import RatePlanPrice type from its definition file
-; // Adjust the path as needed
+
 
 // ✅ Fetch rates by hotel and date range
 export const fetchRatePlanPricesByHotel = async (
@@ -12,14 +11,19 @@ export const fetchRatePlanPricesByHotel = async (
   toDate: string
 ): Promise<RatePlanPriceDTO[]> => {
   const response = await axiosInstance.get('/rate-plan-prices/get-by-hotel', {
-    params: { hotelId, fromDate, toDate },
+    params: {
+      hotelId,
+      fromDate,
+      toDate,
+    },
   });
   return response.data;
 };
 
-// ✅ Update rates (bulk update)
-export const updateRatePlanPrices = async (
-  rates: RatePlanPriceDTO[]
-): Promise<void> => {
-  await axiosInstance.put('/rate-plan-prices/rates/update', rates);
+// ✅ Upsert rate plan prices (works like PUT via POST)
+export const upsertRatePlanPrices = async (
+  payload: RatePlanPriceDTO[]
+): Promise<string> => {
+  const response = await axiosInstance.post('/rate-plan-prices/rates/update', payload);
+  return response.data; // returns "Rates updated successfully."
 };

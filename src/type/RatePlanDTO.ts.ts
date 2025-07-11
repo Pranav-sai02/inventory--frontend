@@ -1,5 +1,4 @@
-// src/type/RatePlanDTO.ts
-export interface RatePlans {
+export interface RatePlanDTO {
   ratePlanId: number;
   roomId: number;
   ratePlanName: string;
