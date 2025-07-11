@@ -1,17 +1,61 @@
-html,
-body,
-#root {
-  height: 100%;
+/* General page styling */
+body {
   margin: 0;
-  padding: 0;
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f2f2f2;
 }
 
+/* Header Bar */
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
+}
+
+.left-header {
+  display: flex;
+  align-items: center;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  margin-right: 15px;
+  cursor: pointer;
+  color: #333;
+}
+
+.hotel-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.hotel-name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.hotel-address {
+  font-size: 14px;
+  color: #666;
+}
+
+.hotel-dropdown select {
+  padding: 6px 10px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+/* Inventory Page - Full Screen Layout */
 .inventory-page {
   width: 100%;
   min-height: 100vh;
-  margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background: #f9f9f9;
+  background-color: #f9f9f9;
   display: flex;
   flex-direction: column;
 }
@@ -20,17 +64,17 @@ body,
   background-color: #1abc9c;
   color: white;
   font-weight: bold;
-  padding: 15px 20px;
-  font-size: 18px;
+  padding: 20px;
+  font-size: 20px;
 }
 
 .inventory-content {
-  /* Removed flex: 1 so it shrinks to content height */
-  padding: 30px 20px;
+  flex: 1;
+  padding: 30px 40px;
   background: #fff;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 30px;
 }
 
 .inventory-row {
@@ -38,84 +82,52 @@ body,
   flex-direction: column;
 }
 
-.inventory-row label {
-  font-weight: 500;
-  margin-bottom: 6px;
-  font-size: 15px;
-  color: #333;
-}
-
-.days-row {
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.days-buttons {
+/* Date Picker Container */
+.date-picker-container {
+  width: 100%;
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.day-btn {
-  width: 32px;
-  height: 32px;
-  background: white;
-  border: 1px solid #00796b;
-  color: #00796b;
-  border-radius: 4px;
-  cursor: pointer;
+  flex-direction: column;
+  gap: 6px;
   font-size: 14px;
 }
 
-.day-btn.selected {
-  background: #00796b;
-  color: white;
-}
-
+/* Room Inputs - Full Column */
 .rooms-inputs {
   display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.room-input {
-  display: flex;
-  flex-direction: column;
+  gap: 24px;
 }
 
 .room-input label {
-  font-size: 14px;
-  margin-bottom: 4px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  display: block;
 }
 
 .room-input input {
-  width: 120px;
-  padding: 6px;
+  width: 15%;
+  padding: 10px 12px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  text-align: center;
+  font-size: 14px;
 }
 
+/* Submit Button */
 .submit-container {
-  /* Removed margin-top: auto */
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .submit-btn {
   background-color: #1abc9c;
   color: white;
+  padding: 10px 20px;
+  font-size: 15px;
   border: none;
-  padding: 10px 18px;
-  font-size: 14px;
   border-radius: 4px;
   cursor: pointer;
+  transition: background 0.3s ease;
 }
 
-.date-picker-input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  width: 300px;
+.submit-btn:hover {
+  background-color: #16a085;
 }

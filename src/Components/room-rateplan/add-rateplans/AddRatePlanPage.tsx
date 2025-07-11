@@ -1,11 +1,10 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./AddRatePlanPage.css";
 
-import { RatePlan } from "../../type/addRatePlan";
-import { useCreateRatePlan } from "../../hooks/useRatePlan";
+import { RatePlan } from "../../../type/addRatePlan";
+import { useCreateRatePlan } from "../../../hooks/useRatePlan";
 
-// Hardcoded options
 const rateplanOptions = ["AP", "EP", "CP", "MAP"];
 const mealPlanOptions = [
   "Accommodation only",
@@ -22,9 +21,8 @@ const mealPlanOptions = [
 
 const AddRatePlanPage: React.FC = () => {
   const navigate = useNavigate();
-
-  // Static room ID for testing
-  const roomId = 1;
+  const { roomId } = useParams(); // 👈 get from URL
+  const numericRoomId = parseInt(roomId || "", 10);
 
   const [rateplanName, setRateplanName] = useState("EP");
   const [mealPlan, setMealPlan] = useState("Accommodation only");
@@ -32,16 +30,21 @@ const AddRatePlanPage: React.FC = () => {
   const createRatePlanMutation = useCreateRatePlan();
 
   const handleSave = () => {
+    if (!numericRoomId || isNaN(numericRoomId)) {
+      alert("Room ID is missing or invalid!");
+      return;
+    }
+
     const newRatePlan: Omit<RatePlan, "id"> = {
       ratePlanName: rateplanName,
       mealPlan,
-      roomId, // 👈 sent as part of payload
+      roomId: numericRoomId,
     };
 
     createRatePlanMutation.mutate(newRatePlan, {
       onSuccess: () => {
         alert("Rate plan created successfully!");
-        navigate(-1); // return to previous page
+        navigate(-1);
       },
       onError: () => {
         alert("Failed to create rate plan.");

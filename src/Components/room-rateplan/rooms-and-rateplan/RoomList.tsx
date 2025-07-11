@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./RoomList.css";
-import ViewRatePlan from "../room-rateplan/ViewRatePlan";
+import ViewRatePlan from "../view-rateplans/ViewRatePlan";
 import { useQuery } from "@tanstack/react-query";
-import { fetchRoomsByHotel } from "../../api/rooms";
+import { fetchRoomsByHotel } from "../../../api/rooms";
+import { useHotels } from "../../../hooks/useHotels";
+import { Hotel } from "../../../type/Hotel";
 
 interface Room {
   id: number;
@@ -14,27 +16,39 @@ interface Room {
 
 const RoomList: React.FC = () => {
   const navigate = useNavigate();
-  const hotelId = 111;
+  const [hotelId, setHotelId] = useState<number>(111);
 
-  const { data, isLoading, isError } = useQuery({
+  // Fetch hotels for dropdown and hotel info
+  const { data: hotels } = useHotels();
+
+  // Find the selected hotel info
+  const selectedHotel: Hotel | undefined = hotels?.find((h) => h.hotelId === hotelId);
+
+  // Fetch rooms for the selected hotel
+  const {
+    data: roomsData,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["rooms", hotelId],
     queryFn: () => fetchRoomsByHotel(hotelId),
+    enabled: !!hotelId,
   });
 
   const [rooms, setRooms] = useState<Room[]>([]);
   const [selectedRoomIndex, setSelectedRoomIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    if (data) {
-      const transformedRooms: Room[] = data.map((room: any) => ({
+    if (roomsData) {
+      const transformed: Room[] = roomsData.map((room: any) => ({
         id: room.roomId,
         name: room.roomName,
         description: room.description,
-        active: true, // Default since API doesn’t return this
+        active: true,
       }));
-      setRooms(transformedRooms);
+      setRooms(transformed);
     }
-  }, [data]);
+  }, [roomsData]);
 
   const toggleActive = (index: number) => {
     const updated = [...rooms];
@@ -43,11 +57,7 @@ const RoomList: React.FC = () => {
   };
 
   const handleViewRateplans = (index: number) => {
-    if (selectedRoomIndex === index) {
-      setSelectedRoomIndex(null);
-    } else {
-      setSelectedRoomIndex(index);
-    }
+    setSelectedRoomIndex(prev => (prev === index ? null : index));
   };
 
   if (isLoading) return <div>Loading rooms...</div>;
@@ -62,21 +72,22 @@ const RoomList: React.FC = () => {
             <span className="back-icon">←</span>
           </button>
           <div className="hotel-info">
-            <div className="hotel-name">Hotel Name: Hotel Vista</div>
-            <div className="hotel-address">
-              Address: 3-12 Ayodhya nagara jntu Hyderabad Telangana
-            </div>
+            <div className="hotel-name">Hotel Name: {selectedHotel?.hotelName || "Loading..."}</div>
+            <div className="hotel-address">Address: {selectedHotel?.hotelAddress || "N/A"}</div>
           </div>
         </div>
         <div className="hotel-dropdown">
-          <select>
-            <option>Hotel Vista - 41365364</option>
-            <option>Hotel Paradise - 12345678</option>
+          <select value={hotelId} onChange={(e) => setHotelId(Number(e.target.value))}>
+            {hotels?.map((hotel) => (
+              <option key={hotel.hotelId} value={hotel.hotelId}>
+                {hotel.hotelName} - {hotel.hotelId}
+              </option>
+            ))}
           </select>
         </div>
       </div>
 
-      {/* Existing Rooms heading + create button */}
+      {/* Top bar */}
       <div className="top-bar">
         <h2 className="top-bar-title">Existing Rooms ({rooms.length})</h2>
         <button className="create-room-btn" onClick={() => navigate("/create-room")}>
@@ -84,7 +95,7 @@ const RoomList: React.FC = () => {
         </button>
       </div>
 
-      {/* Room list table */}
+      {/* Room table */}
       <table className="table">
         <thead>
           <tr>
@@ -110,27 +121,23 @@ const RoomList: React.FC = () => {
                       />
                       Active
                     </label>
-                    <button className="action-link" onClick={() => navigate("/edit-room")}>
+                    <button
+                      className="action-link"
+                      onClick={() => navigate("/create-room", { state: { room: room } })}
+                    >
                       EDIT ROOM
                     </button>
                     <button
                       className="action-link"
-                      onClick={() =>
-                        navigate("/add-rateplan", { state: { roomId: room.id } })
-                      }
+                      onClick={() => navigate(`/add-rateplan/${room.id}`)}
                     >
                       + ADD RATEPLAN
                     </button>
                   </div>
                 </td>
                 <td className="rateplans">
-                  <button
-                    className="action-link"
-                    onClick={() => handleViewRateplans(index)}
-                  >
-                    {selectedRoomIndex === index
-                      ? "CLOSE RATEPLANS"
-                      : "CLICK TO VIEW RATEPLANS"}
+                  <button className="action-link" onClick={() => handleViewRateplans(index)}>
+                    {selectedRoomIndex === index ? "CLOSE RATEPLANS" : "CLICK TO VIEW RATEPLANS"}
                   </button>
                 </td>
               </tr>

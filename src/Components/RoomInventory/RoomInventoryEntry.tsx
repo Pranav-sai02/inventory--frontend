@@ -1,35 +1,49 @@
 import React, { useState, forwardRef } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useNavigate } from "react-router-dom";
 import "./RoomInventoryEntry.css";
 
+import { useHotels } from "../../hooks/useHotels";
+import { useSaveInventory } from "../../hooks/useRoomAvailability";
+import { SaveInventoryRequest } from "../../type/roomAvailability";
+
 const RoomInventoryEntry: React.FC = () => {
-  const [selectedDays, setSelectedDays] = useState<string[]>([]);
-  const [showNettRate, setShowNettRate] = useState(false);
+  const navigate = useNavigate();
+  const hotelId = 111; // ✅ Static for now
+  const { data: hotels } = useHotels();
+  const saveInventoryMutation = useSaveInventory();
+
   const [inventory, setInventory] = useState({
-    twinBed: "10",
-    beach: "10",
-    executive: "5",
+    twinBed: "0",
+    beach: "0",
+    executive: "0",
   });
+
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
   const [startDate, endDate] = dateRange;
 
-  const days = ["M", "T", "W", "TH", "F", "SA", "S"];
-
-  const toggleDay = (day: string) => {
-    setSelectedDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
-    );
-  };
+  const selectedHotel = hotels?.find((h) => h.hotelId === hotelId);
 
   const handleSubmit = () => {
-    alert("Inventory submitted!");
-    console.log("Submitted data:", {
-      dateRange,
-      selectedDays,
-      showNettRate,
-      inventory,
-    });
+    if (!startDate || !endDate) {
+      alert("Please select a valid date range.");
+      return;
+    }
+
+    const payload: SaveInventoryRequest = {
+      hotelId,
+      fromDate: startDate.toISOString().split("T")[0], // ✅ renamed
+      toDate: endDate.toISOString().split("T")[0],     // ✅ renamed
+      rooms: [                                         // ✅ renamed
+        { roomId: 1, roomName: "Twin Bed Room", availableCount: parseInt(inventory.twinBed) },
+        { roomId: 2, roomName: "Beach Room", availableCount: parseInt(inventory.beach) },
+        { roomId: 3, roomName: "Executive Room", availableCount: parseInt(inventory.executive) },
+      ],
+    };
+
+
+    saveInventoryMutation.mutate(payload);
   };
 
   const CustomDateInput = forwardRef<HTMLInputElement, { value?: string; onClick?: () => void }>(
@@ -50,8 +64,10 @@ const RoomInventoryEntry: React.FC = () => {
         <input
           ref={ref}
           value={value}
-          readOnly
           placeholder="Select date range"
+          onChange={(e) => {
+            if (e.target.value === "") setDateRange([null, null]);
+          }}
           style={{
             border: "none",
             outline: "none",
@@ -61,97 +77,86 @@ const RoomInventoryEntry: React.FC = () => {
             cursor: "pointer",
           }}
         />
-        <span
-          role="img"
-          aria-label="calendar"
-          style={{ fontSize: "18px", marginLeft: "6px" }}
-        >
-          📅
+        <span role="img" aria-label="calendar" style={{ fontSize: "18px", marginLeft: "6px" }}>
+          🗓️
         </span>
       </div>
     )
   );
 
   return (
-    <div className="inventory-page">
-      <div className="inventory-header">Room Inventory Entry</div>
-
-      <div className="inventory-content">
-        <div className="inventory-row">
-          <label>Select dates to update inventory for *</label>
-          <DatePicker
-            selectsRange
-            startDate={startDate}
-            endDate={endDate}
-            onChange={(update) => setDateRange(update)}
-            isClearable={true}
-            customInput={<CustomDateInput />}
-          />
+    <div>
+      {/* Header Bar */}
+      <div className="header-bar">
+        <div className="left-header">
+          <button className="back-btn" onClick={() => navigate(-1)}>
+            <span className="back-icon">←</span>
+          </button>
+          <div className="hotel-info">
+            <div className="hotel-name">
+              Hotel Name: {selectedHotel?.hotelName || "Loading..."}
+            </div>
+            <div className="hotel-address">
+              Address: {selectedHotel?.hotelAddress || "Fetching address..."}
+            </div>
+          </div>
         </div>
+        <div className="hotel-dropdown">
+          <select value={hotelId} disabled>
+            {hotels?.map((hotel) => (
+              <option key={hotel.hotelId} value={hotel.hotelId}>
+                {hotel.hotelName} - {hotel.hotelId}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
-        <div className="inventory-row days-row">
-          <label>Selected days ({selectedDays.length})</label>
-          <div className="days-buttons">
-            {days.map((day, index) => (
-              <button
-                key={index}
-                className={`day-btn ${selectedDays.includes(day) ? "selected" : ""}`}
-                onClick={() => toggleDay(day)}
-              >
-                {day}
-              </button>
+      {/* Inventory Form Section */}
+      <div className="inventory-page">
+        <div className="inventory-header">Room Inventory Entry</div>
+        <div className="inventory-content">
+          {/* Date Picker */}
+          <div className="date-picker-container">
+            <label>Select Date Range</label>
+            <DatePicker
+              selectsRange
+              startDate={startDate}
+              endDate={endDate}
+              onChange={(update) => setDateRange(update)}
+              customInput={<CustomDateInput />}
+              isClearable
+            />
+          </div>
+
+          {/* Room Inputs */}
+          <div className="rooms-inputs">
+            {[
+              { key: "twinBed", label: "Twin Bed Room" },
+              { key: "beach", label: "Beach Room" },
+              { key: "executive", label: "Executive Room" },
+            ].map(({ key, label }) => (
+              <div className="room-input" key={key}>
+                <label>{label}</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={inventory[key as keyof typeof inventory]}
+                  onChange={(e) => {
+                    const value = Math.max(0, parseInt(e.target.value) || 0);
+                    setInventory({ ...inventory, [key]: value.toString() });
+                  }}
+                />
+              </div>
             ))}
           </div>
-        </div>
 
-        <div className="inventory-row">
-          <label>
-            <input
-              type="checkbox"
-              checked={showNettRate}
-              onChange={(e) => setShowNettRate(e.target.checked)}
-            />
-            Show Nett Rate
-          </label>
-        </div>
-
-        <div className="rooms-inputs">
-          <div className="room-input">
-            <label>Twin Bed Room</label>
-            <input
-              type="number"
-              value={inventory.twinBed}
-              onChange={(e) =>
-                setInventory({ ...inventory, twinBed: e.target.value })
-              }
-            />
+          {/* Submit */}
+          <div className="submit-container">
+            <button className="submit-btn" onClick={handleSubmit}>
+              Submit Inventory
+            </button>
           </div>
-          <div className="room-input">
-            <label>Beach Room</label>
-            <input
-              type="number"
-              value={inventory.beach}
-              onChange={(e) =>
-                setInventory({ ...inventory, beach: e.target.value })
-              }
-            />
-          </div>
-          <div className="room-input">
-            <label>Executive Room</label>
-            <input
-              type="number"
-              value={inventory.executive}
-              onChange={(e) =>
-                setInventory({ ...inventory, executive: e.target.value })
-              }
-            />
-          </div>
-        </div>
-
-        <div className="submit-container">
-          <button className="submit-btn" onClick={handleSubmit}>
-            Submit Inventory
-          </button>
         </div>
       </div>
     </div>

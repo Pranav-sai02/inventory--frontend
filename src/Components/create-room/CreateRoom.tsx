@@ -1,19 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import "./CreateRoom.css";
-import { useCreateRoom } from "../../hooks/useRooms";
+import { useCreateRoom, useUpdateRoom } from "../../hooks/useRooms";
 import { Room } from "../../type/room";
 
 const CreateRoom: React.FC = () => {
-  const hotelId = 111; // ✅ static for now
-  const createRoomMutation = useCreateRoom(hotelId);
+  const location = useLocation();
+  const editingRoom = location.state?.room as Room | undefined;
 
-  const [roomType, setRoomType] = useState("");
-  const [roomView, setRoomView] = useState("");
-  const [roomSize, setRoomSize] = useState(""); // string input, converted to number
-  const [sizeUnit, setSizeUnit] = useState<"SQFT" | "SQM">("SQFT");
-  const [roomName, setRoomName] = useState("");
-  const [numberOfRooms, setNumberOfRooms] = useState(1);
-  const [description, setDescription] = useState("");
+  const hotelId = 111; // static for now
+  const createRoomMutation = useCreateRoom(hotelId);
+  const updateRoomMutation = useUpdateRoom(hotelId);
+
+  const [roomType, setRoomType] = useState(editingRoom?.roomType || "");
+  const [roomView, setRoomView] = useState(editingRoom?.roomView || "");
+  const [roomSize, setRoomSize] = useState(editingRoom?.roomSize?.toString() || "");
+  const [sizeUnit, setSizeUnit] = useState<"SQFT" | "SQM">(editingRoom?.sizeUnit || "SQFT");
+  const [roomName, setRoomName] = useState(editingRoom?.roomName || "");
+  const [numberOfRooms, setNumberOfRooms] = useState(editingRoom?.numberOfRooms || 1);
+  const [description, setDescription] = useState(editingRoom?.description || "");
 
   const handleSubmit = () => {
     if (!roomName || !roomType || !roomView || !roomSize || !sizeUnit) {
@@ -21,7 +26,8 @@ const CreateRoom: React.FC = () => {
       return;
     }
 
-    const payload: Omit<Room, "id"> = {
+    const payload: Room = {
+      ...(editingRoom ?? {}),
       roomName,
       description,
       numberOfRooms,
@@ -32,26 +38,37 @@ const CreateRoom: React.FC = () => {
       hotelId,
     };
 
-    createRoomMutation.mutate(payload, {
-      onSuccess: () => {
-        alert("Room created successfully!");
-        setRoomType("");
-        setRoomView("");
-        setRoomSize("");
-        setSizeUnit("SQFT");
-        setRoomName("");
-        setNumberOfRooms(1);
-        setDescription("");
-      },
-      onError: () => {
-        alert("Failed to create room.");
-      },
-    });
+    if (editingRoom) {
+      // 🔁 Update mode
+      updateRoomMutation.mutate(payload, {
+        onSuccess: () => alert("Room updated successfully!"),
+        onError: () => alert("Failed to update room."),
+      });
+    } else {
+      // 🆕 Create mode
+      const { id, ...createPayload } = payload;
+      createRoomMutation.mutate(createPayload, {
+        onSuccess: () => {
+          alert("Room created successfully!");
+          // Reset only on create
+          setRoomType("");
+          setRoomView("");
+          setRoomSize("");
+          setSizeUnit("SQFT");
+          setRoomName("");
+          setNumberOfRooms(1);
+          setDescription("");
+        },
+        onError: () => alert("Failed to create room."),
+      });
+    }
   };
 
   return (
     <div className="create-room-page">
-      <h1 className="page-title-outside">Create Room</h1>
+      <h1 className="page-title-outside">
+        {editingRoom ? "Edit Room" : "Create Room"}
+      </h1>
 
       <div className="create-room-wrapper">
         <div className="step-content">
@@ -136,7 +153,7 @@ const CreateRoom: React.FC = () => {
           {/* Room Name */}
           <div className="form-row">
             <div className="form-label">
-              <label>Room Name as shown on MakeMyTrip & its partner websites</label>
+              <label>Room Name</label>
               <p className="sub-text">Add a room name that looks attractive to travellers</p>
             </div>
             <div className="form-input">
@@ -153,7 +170,7 @@ const CreateRoom: React.FC = () => {
           {/* Number of Rooms */}
           <div className="form-row">
             <div className="form-label">
-              <label>Number of rooms (of this type)</label>
+              <label>Number of rooms</label>
               <p className="sub-text">Specify how many rooms of this type are at your property</p>
             </div>
             <div className="form-input">
@@ -170,7 +187,7 @@ const CreateRoom: React.FC = () => {
           {/* Description */}
           <div className="form-row">
             <div className="form-label">
-              <label>Description of the room (Optional)</label>
+              <label>Description (Optional)</label>
               <p className="sub-text">
                 Highlight what makes this room appealing — its view, comfort, and key features.
               </p>
@@ -191,7 +208,7 @@ const CreateRoom: React.FC = () => {
               Cancel
             </button>
             <button className="next-btn" onClick={handleSubmit}>
-              Next
+              {editingRoom ? "Update Room" : "Create Room"}
             </button>
           </div>
         </div>

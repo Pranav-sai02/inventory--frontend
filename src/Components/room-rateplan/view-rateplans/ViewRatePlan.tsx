@@ -1,6 +1,6 @@
 import React from "react";
 import "./ViewRatePlan.css";
-import { useRatePlansByRoom } from "../../hooks/useRatePlan";
+import { useRatePlansByRoom } from "../../../hooks/useRatePlan";
 
 
 interface ViewRatePlanProps {

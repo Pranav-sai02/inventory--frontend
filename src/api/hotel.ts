@@ -5,13 +5,13 @@ import axiosInstance from './axiosInstance';
 
 // ✅ Fetch all hotels
 export const fetchAllHotels = async (): Promise<Hotel[]> => {
-  const response = await axiosInstance.get('/hotels/hotels');
+  const response = await axiosInstance.get('/hotels/all');
   return response.data;
 };
 
 // ✅ Save hotel
 export const saveHotel = async (hotel: Hotel): Promise<Hotel> => {
-  const response = await axiosInstance.post('/hotels/save', hotel);
+  const response = await axiosInstance.post('/hotels/saveHotel', hotel);
   return response.data;
 };
 

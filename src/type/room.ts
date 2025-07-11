@@ -7,5 +7,7 @@ export interface Room {
   roomSize: number;          // maps to roomSize — should be number
   sizeUnit: 'SQFT' | 'SQM';  // maps to sizeUnit — must match backend enum exactly
   numberOfRooms: number;     // maps to numberOfRooms
-  hotelId: number;           // maps to hotelId
+  hotelId: number;    
+  
+    active?: boolean;       // maps to hotelId
 }

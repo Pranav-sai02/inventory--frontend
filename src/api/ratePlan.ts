@@ -9,10 +9,15 @@ export const fetchRatePlansByRoom = async (roomId: number): Promise<RatePlan[]> 
 
 // ✅ CREATE a new rate plan
 export const createRatePlan = async (ratePlan: Omit<RatePlan, 'id'>): Promise<void> => {
-  await axiosInstance.post('/rateplans/save', ratePlan);
+  await axiosInstance.post('/rateplans/saveRatePlan', ratePlan);
 };
 
-// ✅ UPDATE an existing rate plan
+// ✅ UPDATE an existing rate plan by ID
 export const updateRatePlan = async (ratePlan: RatePlan): Promise<void> => {
-  await axiosInstance.put(`/rateplans/${ratePlan.id}`, ratePlan);
+  await axiosInstance.put(`/rateplans/update/${ratePlan.id}`, ratePlan);
 };
+
+// // ✅ DELETE a rate plan by ID (optional, if you add it to backend)
+// export const deleteRatePlan = async (id: number): Promise<void> => {
+//   await axiosInstance.delete(`/rateplans/${id}`);
+// };
