@@ -47,9 +47,9 @@ const App: React.FC = () => {
             {/* ✅ New route for inventory entry */}
             <Route path="/inventory-entry" element={<RoomInventoryEntry />} />
             <Route path="/rateplan" element={<InventoryManagement />} />
-            <Route path="/rate-plan-popup" element={<RateManager ratePlan={null} onClose={function (): void {
-              throw new Error('Function not implemented.');
-            } } />} />
+              <Route path="/rate-plan-popup" element={<RateManager ratePlan={null} onClose={function (): void {
+                throw new Error('Function not implemented.');
+              } } />} />
 
 
             {/* Add other routes here */}

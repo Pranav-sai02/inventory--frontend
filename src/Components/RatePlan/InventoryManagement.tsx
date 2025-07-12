@@ -5,6 +5,7 @@ import { Room } from '../../type/room';
 import { RatePlanPriceDTO } from '../../type/RatePlanPriceDto';
 import { useHotels } from '../../hooks/useHotels';
 import { useRooms } from '../../hooks/useRooms';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -74,6 +75,7 @@ type RateMap = Record<string, { twoPersonRate: number[]; onePersonRate: number[]
 
 
 const InventoryManagement: React.FC = () => {
+    const navigate = useNavigate();
     const [expandedRooms, setExpandedRooms] = useState<Record<number, boolean>>({});
 
     const [selectedHotelId, setSelectedHotelId] = useState<number | null>(null);
@@ -352,7 +354,7 @@ const InventoryManagement: React.FC = () => {
                 EXPAND ALL ROOMS & RATEPLANS
               </button> */}
                         </div>
-                        
+
 
                         <div className="navigation-right">
                             <button className="bulk-update-button">
@@ -402,17 +404,17 @@ const InventoryManagement: React.FC = () => {
                                 </button>
                             </div>
                             <button
-                            className="save-button"
-                            onClick={() => {
-                                if (inventoryData) {
-                                    const payload = convertInventoryToRatePlanPrices(inventoryData, weekDays);
-                                    console.log("Submitting to backend:", payload);
-                                    // TODO: send to backend
-                                }
-                            }}
-                        >
-                            Save Inventory
-                        </button>
+                                className="save-button"
+                                onClick={() => {
+                                    if (inventoryData) {
+                                        const payload = convertInventoryToRatePlanPrices(inventoryData, weekDays);
+                                        console.log("Submitting to backend:", payload);
+                                        // TODO: send to backend
+                                    }
+                                }}
+                            >
+                                Save Inventory
+                            </button>
                         </div>
                     </div>
 
@@ -510,7 +512,18 @@ const InventoryManagement: React.FC = () => {
                                                                         </div>
                                                                     </div>
                                                                     <div className="cp-row-2">
-                                                                        <button className="update-rate-button">
+                                                                        <button
+                                                                            className="update-rate-button"
+                                                                            onClick={() =>
+                                                                                navigate('/rate-plan-popup', {
+                                                                                    state: {
+                                                                                        ratePlan,
+                                                                                        roomId: room.roomId,
+                                                                                        hotelId: selectedHotelId,
+                                                                                    },
+                                                                                })
+                                                                            }
+                                                                        >
                                                                             UPDATE RATE
                                                                         </button>
                                                                         <div className="person-1-info">
@@ -599,14 +612,14 @@ const InventoryManagement: React.FC = () => {
                                 ))}
                             </tbody>
                         </table>
-                        
+
 
                     </div>
-                    
+
                 </div>
-                
+
             </div>
-            
+
         </div>
     );
 };
