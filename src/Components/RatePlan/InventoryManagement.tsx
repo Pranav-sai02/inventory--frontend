@@ -352,6 +352,7 @@ const InventoryManagement: React.FC = () => {
                 EXPAND ALL ROOMS & RATEPLANS
               </button> */}
                         </div>
+                        
 
                         <div className="navigation-right">
                             <button className="bulk-update-button">
@@ -392,6 +393,7 @@ const InventoryManagement: React.FC = () => {
                                     )}
                                 </div>
 
+
                                 <button
                                     onClick={() => navigateWeek('next')}
                                     className="nav-button"
@@ -399,6 +401,18 @@ const InventoryManagement: React.FC = () => {
                                     <ChevronRight className="icon" />
                                 </button>
                             </div>
+                            <button
+                            className="save-button"
+                            onClick={() => {
+                                if (inventoryData) {
+                                    const payload = convertInventoryToRatePlanPrices(inventoryData, weekDays);
+                                    console.log("Submitting to backend:", payload);
+                                    // TODO: send to backend
+                                }
+                            }}
+                        >
+                            Save Inventory
+                        </button>
                         </div>
                     </div>
 
@@ -585,9 +599,14 @@ const InventoryManagement: React.FC = () => {
                                 ))}
                             </tbody>
                         </table>
+                        
+
                     </div>
+                    
                 </div>
+                
             </div>
+            
         </div>
     );
 };
