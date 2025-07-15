@@ -606,7 +606,7 @@
 }
 
 .rate-plan-cell {
-  padding: 16px 16px 16px 48px;
+  padding: 16px 16px 16px 10px;
 }
 
 .rate-plan-info-custom {
@@ -644,7 +644,7 @@
 .cp-row-1 {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 60px;
 }
 
 .cp-row-2 {

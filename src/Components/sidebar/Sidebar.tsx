@@ -13,9 +13,9 @@ const Sidebar: React.FC<SidebarProps> = ({
     { name: 'Add Hotel', path: '/add-hotel' },
     { name: 'Properties', path: '/properties' },
     { name: 'Room & Rateplan', path: '/room-rateplan' },
-    { name: 'Room Allocated Count', path: '/inventory-entry' }, // ✅ FIXED PATH
-    { name: 'rateplan', path: '/rateplan' },
-    { name: 'rate-plan-popup', path: '/rate-plan-popup' },
+    { name: 'Room Inventory Entry', path: '/inventory-entry' }, // ✅ FIXED PATH
+    { name: 'Inventory', path: '/rateplan' },
+    
   ];
 
   return (

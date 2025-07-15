@@ -6,7 +6,7 @@ import { RatePlanPriceDTO } from '../../type/RatePlanPriceDto';
 import { useHotels } from '../../hooks/useHotels';
 import { useRooms } from '../../hooks/useRooms';
 import { useNavigate } from 'react-router-dom';
-
+import { useRatePlanPrices, useUpdateRatePlanPrices } from '../../hooks/useRatePlanPrices';
 
 
 
@@ -71,8 +71,6 @@ function formatDateToISO(start: Date, offset: number): string {
     date.setDate(start.getDate() + offset);
     return date.toISOString().split('T')[0];
 }
-type RateMap = Record<string, { twoPersonRate: number[]; onePersonRate: number[] }>;
-
 
 const InventoryManagement: React.FC = () => {
     const navigate = useNavigate();
@@ -85,7 +83,17 @@ const InventoryManagement: React.FC = () => {
     const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
     const [inventoryData, setInventoryData] = useState<InventoryData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const { mutate: saveRates, isPending: savingRates } = useUpdateRatePlanPrices();
+
     const [showCalendar, setShowCalendar] = useState(false);
+    const startDateStr = currentWeekStart.toISOString().split('T')[0];
+
+    const endDate = new Date(currentWeekStart);
+    endDate.setDate(endDate.getDate() + 6);
+    const endDateStr = endDate.toISOString().split('T')[0];
+
+    const DAY_COUNT = 7;
+
 
 
     useEffect(() => {
@@ -100,7 +108,7 @@ const InventoryManagement: React.FC = () => {
         const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
         const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < DAY_COUNT; i++) {
             const date = new Date(startDate);
             date.setDate(startDate.getDate() + i);
 
@@ -121,6 +129,12 @@ const InventoryManagement: React.FC = () => {
     const [weekDays, setWeekDays] = useState<DayData[]>(generateWeekDays(currentWeekStart));
 
     const { data: room = [], isLoading: roomLoading } = useRooms(selectedHotelId ?? 0);
+    const { data: fetchedPrices = [], isLoading: ratesLoading } = useRatePlanPrices(
+        selectedHotelId ?? 0,
+        startDateStr,
+        endDateStr
+    );
+
 
 
 
@@ -128,30 +142,21 @@ const InventoryManagement: React.FC = () => {
     const initializeInventoryData = (): InventoryData => {
         const data: InventoryData = {
             hotelId: selectedHotelId?.toString() ?? '',
-
             weekStartDate: currentWeekStart.toISOString(),
             rooms: {}
         };
 
         room.forEach(room => {
             data.rooms[room.roomId] = {
-                inventory: [0, 0, 0, 0, 0, 0, 0],
-                sold: [0, 0, 0, 0, 0, 0, 0],
+                inventory: [],
+                sold: [],
                 rates: {}
             };
-
-            if (room.ratePlans) {
-                room.ratePlans.forEach(ratePlan => {
-                    data.rooms[room.roomId].rates[String(ratePlan.ratePlanId ?? '')] = {
-                        twoPersonRate: [0, 0, 0, 0, 0, 0, 0],
-                        onePersonRate: [0, 0, 0, 0, 0, 0, 0]
-                    };
-                });
-            }
         });
 
         return data;
     };
+
 
 
     // ✅ Just updates weekdays when week changes
@@ -167,6 +172,30 @@ const InventoryManagement: React.FC = () => {
             setIsLoading(true);
             try {
                 const data = initializeInventoryData();
+                fetchedPrices.forEach((item) => {
+                    if (item.ratePlanId == null) {
+                        console.warn("Skipping item with null ratePlanId", item);
+                        return;
+                    }
+
+                    const roomEntry = data.rooms[item.roomId];
+                    if (!roomEntry) return;
+
+                    // Calculate index (0 to 6)
+                    const date = new Date(item.date);
+                    const start = new Date(currentWeekStart);
+                    const dayIndex = Math.floor((date.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+                    if (dayIndex < 0 || dayIndex >= DAY_COUNT) return;
+
+                    roomEntry.inventory[dayIndex] = item.availableCount ?? 0;
+                    roomEntry.rates[String(item.ratePlanId)] = roomEntry.rates[String(item.ratePlanId)] || {
+                        onePersonRate: new Array(DAY_COUNT).fill(0),
+                        twoPersonRate: new Array(DAY_COUNT).fill(0),
+                    };
+
+                    roomEntry.rates[String(item.ratePlanId)].onePersonRate[dayIndex] = item.pricePerOne ?? 0;
+                    roomEntry.rates[String(item.ratePlanId)].twoPersonRate[dayIndex] = item.pricePerTwo ?? 0;
+                });
                 setInventoryData(data);
             } catch (err) {
                 console.error(err);
@@ -193,31 +222,46 @@ const InventoryManagement: React.FC = () => {
         setCurrentWeekStart(newDate);
     };
 
-    const updateRate = (roomId: number, ratePlanId: string, dayIndex: number, rateType: 'twoPersonRate' | 'onePersonRate', value: number) => {
+    const updateRate = (
+        roomId: number,
+        ratePlanId: string,
+        dayIndex: number,
+        rateType: 'twoPersonRate' | 'onePersonRate',
+        value: number
+    ) => {
         if (!inventoryData) return;
 
         setInventoryData(prev => {
             if (!prev) return prev;
 
             const updated = { ...prev };
+
             if (!updated.rooms[roomId]) {
                 updated.rooms[roomId] = {
-                    inventory: new Array(7).fill(0),
-                    sold: new Array(7).fill(0),
+                    inventory: [],
+                    sold: [],
                     rates: {}
                 };
             }
+
+            // Lazy init rates object
             if (!updated.rooms[roomId].rates[ratePlanId]) {
                 updated.rooms[roomId].rates[ratePlanId] = {
-                    twoPersonRate: new Array(7).fill(0),
-                    onePersonRate: new Array(7).fill(0)
+                    twoPersonRate: [],
+                    onePersonRate: []
                 };
+            }
+
+            // Lazy init the array itself if not set
+            if (!Array.isArray(updated.rooms[roomId].rates[ratePlanId][rateType])) {
+                updated.rooms[roomId].rates[ratePlanId][rateType] = [];
             }
 
             updated.rooms[roomId].rates[ratePlanId][rateType][dayIndex] = value;
             return updated;
         });
     };
+
 
     const updateInventory = (roomId: number, dayIndex: number, value: number) => {
         if (!inventoryData) return;
@@ -226,12 +270,18 @@ const InventoryManagement: React.FC = () => {
             if (!prev) return prev;
 
             const updated = { ...prev };
+
             if (!updated.rooms[roomId]) {
                 updated.rooms[roomId] = {
-                    inventory: new Array(7).fill(0),
-                    sold: new Array(7).fill(0),
+                    inventory: [],
+                    sold: [],
                     rates: {}
                 };
+            }
+
+            // Lazy init inventory array
+            if (!Array.isArray(updated.rooms[roomId].inventory)) {
+                updated.rooms[roomId].inventory = [];
             }
 
             updated.rooms[roomId].inventory[dayIndex] = value;
@@ -239,10 +289,11 @@ const InventoryManagement: React.FC = () => {
         });
     };
 
+
     const getRoomData = (roomId: number) => {
         return inventoryData?.rooms[roomId] || {
-            inventory: new Array(7).fill(0),
-            sold: new Array(7).fill(0),
+            inventory: new Array(DAY_COUNT).fill(0),
+            sold: new Array(DAY_COUNT).fill(0),
             rates: {},
         };
     };
@@ -405,15 +456,24 @@ const InventoryManagement: React.FC = () => {
                             </div>
                             <button
                                 className="save-button"
+                                disabled={savingRates}
                                 onClick={() => {
                                     if (inventoryData) {
                                         const payload = convertInventoryToRatePlanPrices(inventoryData, weekDays);
-                                        console.log("Submitting to backend:", payload);
-                                        // TODO: send to backend
+                                        console.log('Submitting to backend:', payload);
+                                        saveRates(payload, {
+                                            onSuccess: () => {
+                                                alert('Inventory saved successfully!');
+                                            },
+                                            onError: (err) => {
+                                                console.error(err);
+                                                alert('Failed to save inventory.');
+                                            },
+                                        });
                                     }
                                 }}
                             >
-                                Save Inventory
+                                {savingRates ? 'Saving...' : 'Save Inventory'}
                             </button>
                         </div>
                     </div>
@@ -473,10 +533,13 @@ const InventoryManagement: React.FC = () => {
                                                     <span className="room-type-name">{room.roomName}</span>
                                                 </button>
                                             </td>
+
                                             {weekDays.map((day, dayIndex) => {
                                                 const roomData = getRoomData(room.roomId);
-                                                const inventory = roomData.inventory[dayIndex];
-                                                const sold = roomData.sold[dayIndex];
+
+                                                // ✅ Use optional chaining with fallback default values to avoid crashing
+                                                const inventory = roomData.inventory?.[dayIndex] ?? 0;
+                                                const sold = roomData.sold?.[dayIndex] ?? 0;
 
                                                 return (
                                                     <td key={dayIndex} className="inventory-cell">
@@ -587,10 +650,13 @@ const InventoryManagement: React.FC = () => {
                                                         <span className="show-rates-text">Show {room.roomName} rates</span>
                                                     </button>
                                                 </td>
+
                                                 {weekDays.map((day, dayIndex) => {
                                                     const roomData = getRoomData(room.roomId);
-                                                    const inventory = roomData.inventory[dayIndex];
-                                                    const sold = roomData.sold[dayIndex];
+
+                                                    // ✅ Safe fallback handling
+                                                    const inventory = roomData.inventory?.[dayIndex] ?? 0;
+                                                    const sold = roomData.sold?.[dayIndex] ?? 0;
 
                                                     return (
                                                         <td key={dayIndex} className="collapsed-inventory-cell">
