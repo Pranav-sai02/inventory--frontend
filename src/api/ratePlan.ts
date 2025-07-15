@@ -8,7 +8,7 @@ export const fetchRatePlansByRoom = async (roomId: number): Promise<RatePlan[]> 
 };
 
 // ✅ CREATE a new rate plan
-export const createRatePlan = async (ratePlan: Omit<RatePlan, 'id'>): Promise<void> => {
+export const createRatePlan = async (ratePlan: Omit<RatePlan, 'ratePlanId'>): Promise<void> => {
   await axiosInstance.post('/rateplans/saveRatePlan', ratePlan);
 };
 

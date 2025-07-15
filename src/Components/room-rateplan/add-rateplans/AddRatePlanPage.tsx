@@ -35,8 +35,8 @@ const AddRatePlanPage: React.FC = () => {
       return;
     }
 
-    const newRatePlan: Omit<RatePlan, "id"> = {
-      ratePlanName, // ✅ Correct key name
+    const newRatePlan: Omit<RatePlan, "ratePlanId"> = {
+      ratePlanName,
       mealPlan,
       roomId: numericRoomId,
     };

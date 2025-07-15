@@ -2,7 +2,7 @@
 
 export interface RoomAvailabilityDTO {
   roomId: number;
-  roomName: string;
+  roomName?: string;
   availableCount: number;
 }
 

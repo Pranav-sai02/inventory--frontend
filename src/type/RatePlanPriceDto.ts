@@ -5,7 +5,7 @@ export interface RatePlanPriceDTO {
   roomId: number;
   ratePlanId: number;
   date: string; // should be ISO format: YYYY-MM-DD
-  availableCount: number;
+  availableCount?: number;
   pricePerOne: number;
   pricePerTwo: number;
 }

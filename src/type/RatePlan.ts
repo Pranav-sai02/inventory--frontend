@@ -1,5 +1,5 @@
 export interface RatePlan {
-  ratePlanId?: number; // optional during creation
+  ratePlanId: number; // optional during creation
   ratePlanName: string;
   mealPlan: string;
   roomId: number;
